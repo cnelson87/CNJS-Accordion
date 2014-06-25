@@ -1,0 +1,22 @@
+{
+	"name": "CNJS-Accordion",
+	"description": "Accordion widget and/or browserify module",
+	"version": "0.1.0",
+	"main": [
+		"assets/Accordion.js",
+		"assets/Accordion.css"
+	],
+	"authors": [
+		"Chris Nelson <cnelson87@gmail.com>"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cnelson87/CNJS-Accordion"
+	},
+	"dependencies": {
+		"jquery": "~2.1.1",
+		"jquery.easing": "git://github.com/AndrewDryga/jQuery.Easing.git",
+		"Class.js": "~1.0.0"
+	},
+	"private": false
+}

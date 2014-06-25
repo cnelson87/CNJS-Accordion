@@ -1,0 +1,45 @@
+/*
+/* ACCORDION
+/*-----------------------------------------------------*/
+
+
+.accordion {
+	width: 100%;
+	margin-bottom: 1em;
+	position: relative;
+}
+
+	.accordion > ul {
+		list-style: none;
+	}
+		.accordion > ul > li {}
+		.accordion > ul .tab {}
+			.accordion > ul .tab > a {
+				display: block;
+				color: #010101;
+				text-decoration: none;
+				background: #ccc;
+				padding: 0.5em 1em;
+			}
+			.accordion > ul .tab > a.active {
+				color: #fff;
+				background: #333;
+			}
+			.accordion > ul .tab > a:hover,
+			.accordion > ul .tab > a:focus {
+				color: #fff;
+				background: #666;
+			}
+
+	.accordion > ul article.panel {
+		overflow: hidden;
+		position: relative;
+	}
+		.accordion > ul article.panel > .panel-inner {
+			padding: 1em;
+			position: relative;
+		}
+	.accordion > ul article.panel:focus {
+		/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
+		background: #efefef;
+	}
