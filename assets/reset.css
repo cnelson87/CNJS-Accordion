@@ -84,6 +84,7 @@ h4 {
 
 #content {
 	width: 960px;
+	min-height: 540px;
 	margin: 0 auto;
 	padding: 40px 20px;
 	background: #fff;
