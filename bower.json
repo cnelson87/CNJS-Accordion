@@ -16,7 +16,8 @@
 	"dependencies": {
 		"jquery": "~2.1.1",
 		"jquery.easing": "git://github.com/AndrewDryga/jQuery.Easing.git",
-		"Class.js": "~1.0.0"
+		"Class.js": "~1.0.0",
+		"CNJS-HeightEqualizer": ""
 	},
 	"private": false
 }
