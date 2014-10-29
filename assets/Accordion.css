@@ -18,7 +18,7 @@
 				display: block;
 				color: #010101;
 				text-decoration: none;
-				background: #ccc;
+				background: #dcdcdc;
 				padding: 0.5em 1em;
 			}
 			.accordion > ul .tab > a.active {
@@ -28,7 +28,7 @@
 			.accordion > ul .tab > a:hover,
 			.accordion > ul .tab > a:focus {
 				color: #fff;
-				background: #666;
+				background: #787878;
 			}
 
 	.accordion > ul article.panel {
