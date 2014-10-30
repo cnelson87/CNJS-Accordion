@@ -11,8 +11,11 @@
 
 	.accordion > ul {
 		list-style: none;
+		border-bottom: 2px solid #000;
 	}
-		.accordion > ul > li {}
+		.accordion > ul > li {
+			border-top: 2px solid #000;
+		}
 		.accordion > ul .tab {}
 			.accordion > ul .tab > a {
 				display: block;
@@ -21,14 +24,14 @@
 				background: #dcdcdc;
 				padding: 0.5em 1em;
 			}
-			.accordion > ul .tab > a.active {
-				color: #fff;
-				background: #333;
-			}
 			.accordion > ul .tab > a:hover,
 			.accordion > ul .tab > a:focus {
 				color: #fff;
 				background: #787878;
+			}
+			.accordion > ul .tab > a.active {
+				color: #fff;
+				background: #333;
 			}
 
 	.accordion > ul article.panel {
@@ -41,5 +44,5 @@
 		}
 	.accordion > ul article.panel:focus {
 		/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
-		background: #efefef;
+		background: #f9f9f9;
 	}
