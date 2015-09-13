@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"jquery": "~2.1.4",
-		"greensock": "~1.17.0",
+		"greensock": "~1.18.0",
 		"Class.js": "~1.0.0",
 		"CNJS-HeightEqualizer": ""
 	},
