@@ -1,18 +1,18 @@
 /*
 	TITLE: Accordion
 
-	DESCRIPTION: standard accordion
+	DESCRIPTION: Basic Accordion widget
 
-	VERSION: 0.1.0
+	VERSION: 0.2.0
 
 	USAGE: var myAccordion = new Accordion('Element', 'Options')
 		@param {jQuery Object}
 		@param {Object}
 
-	AUTHORS: CN
+	AUTHOR: CN
 
 	DEPENDENCIES:
-		- jQuery 1.10+
+		- jQuery 2.1.4+
 		- greensock
 		- Class.js
 
@@ -299,7 +299,6 @@ var Accordion = Class.extend({
 	}
 
 });
-
 
 //uncomment to use as a browserify module
 //module.exports = Accordion;
