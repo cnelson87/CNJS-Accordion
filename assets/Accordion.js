@@ -29,7 +29,7 @@ var Accordion = Class.extend({
 			selectorTabs: '.tab a',
 			selectorPanels: '.panel',
 			activeClass: 'active',
-			equalizeHeight: true,
+			equalizeHeight: false,
 			selfClosing: true,
 			animDuration: 0.4,
 			animEasing: 'Power4.easeOut',
