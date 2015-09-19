@@ -220,7 +220,6 @@ var Accordion = Class.extend({
 		$elActiveTab.addClass(this.options.activeClass);
 		$elActivePanel.addClass(this.options.activeClass);
 
-
 		if (this.options.equalizeHeight) {
 			height = this.maxHeight;
 			TweenMax.set($elActivePanel, {

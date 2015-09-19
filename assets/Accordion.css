@@ -9,40 +9,61 @@
 	position: relative;
 }
 
-	.accordion > ul {
-		list-style: none;
+	.accordion > dl {
 		border-bottom: 2px solid #000;
 	}
-		.accordion > ul > li {
+		.accordion > dl > dt {
 			border-top: 2px solid #000;
+			border-bottom: 2px solid #000;
+			margin: 0 0 -2px 0;
+			position: relative;
+			z-index: 2;
 		}
-		.accordion > ul .tab {}
-			.accordion > ul .tab > a {
+		.accordion > dl > dd {
+			margin: 0;
+			position: relative;
+			z-index: 1;
+		}
+		.accordion .tab {}
+			.accordion .tab > a {
 				display: block;
-				color: #010101;
+				color: #101010;
 				text-decoration: none;
 				background: #dcdcdc;
 				padding: 0.5em 1em;
+				position: relative;
 			}
-			.accordion > ul .tab > a:hover,
-			.accordion > ul .tab > a:focus {
+			.accordion .tab > a:after {
+				content: ">";
+				display: block;
+				font-weight: normal;
+				position: absolute;
+				right: 20px;
+				top: calc(50% - 0.75em);
+				transform: scaleX(2.5) rotate(90deg);
+			}
+			.accordion .tab > a:hover,
+			.accordion .tab > a:focus {
 				color: #fff;
 				background: #787878;
 			}
-			.accordion > ul .tab > a.active {
+			.accordion .tab > a.active {
 				color: #fff;
 				background: #333;
 			}
+			.accordion .tab > a.active:after {
+				transform: scaleX(2.5) rotate(-90deg);
+			}
 
-	.accordion > ul article.panel {
+	.accordion article.panel {
 		overflow: hidden;
 		position: relative;
 	}
-		.accordion > ul article.panel > .panel-inner {
+		.accordion article.panel > .panel-content {
 			padding: 1em;
 			position: relative;
 		}
-	.accordion > ul article.panel:focus {
+	.accordion article.panel:focus {
 		/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
 		background: #f9f9f9;
 	}
