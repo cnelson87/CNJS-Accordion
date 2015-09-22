@@ -140,7 +140,7 @@ hr {
 	clear: both;
 	background: none;
 	border-top: 2px solid #999;
-	margin: 3.0em 0 1.5em 0;
+	margin: 1.5em 0;
 }
 
 img {
@@ -151,11 +151,11 @@ img {
 
 #content {
 	width: 100%;
-	min-width: 320px;
+	min-width: 360px;
 	min-height: 100vh;
+	background: #fff;
 	margin: 0 auto;
 	padding: 40px 20px;
-	background: #fff;
 }
 
 /* Tablet */
