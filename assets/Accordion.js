@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic Accordion widget
 
-	VERSION: 0.2.0
+	VERSION: 0.2.2
 
 	USAGE: var myAccordion = new Accordion('Element', 'Options')
 		@param {jQuery Object}
@@ -15,6 +15,7 @@
 		- jQuery 2.1.4+
 		- greensock
 		- Class.js
+		- HeightEqualizer.js
 
 */
 
@@ -23,11 +24,12 @@ var Accordion = Class.extend({
 
 		// defaults
 		this.$window = $(window);
+		this.$htmlBody = $('html, body');
 		this.$el = $el;
 		this.options = $.extend({
 			initialIndex: 0,
-			selectorTabs: '.tab a',
-			selectorPanels: '.panel',
+			selectorTabs: '.accordion-header a',
+			selectorPanels: '.accordion-panel',
 			activeClass: 'active',
 			equalizeHeight: false,
 			selfClosing: true,
@@ -37,15 +39,15 @@ var Accordion = Class.extend({
 		}, objOptions || {});
 
 		// element references
-		this.$elTabs = this.$el.find(this.options.selectorTabs);
-		this.$elPanels = this.$el.find(this.options.selectorPanels);
+		this.$tabs = this.$el.find(this.options.selectorTabs);
+		this.$panels = this.$el.find(this.options.selectorPanels);
 
 		// setup & properties
 		this.isAnimating = false;
-		this._len = this.$elPanels.length;
+		this._len = this.$panels.length;
 		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
-		this.prevIndex = false;
+		this.prevIndex = null;
 		this.maxHeight = 'auto';
 
 		// check url hash to override currentIndex
@@ -53,7 +55,7 @@ var Accordion = Class.extend({
 		this.urlHash = window.location.hash.replace('#','') || false;
 		if (this.urlHash) {
 			for (var i=0; i<this._len; i++) {
-				if (this.$elPanels[i].id === this.urlHash) {
+				if (this.$panels[i].id === this.urlHash) {
 					this.currentIndex = i;
 					this.focusOnInit = true;
 					break;
@@ -65,8 +67,6 @@ var Accordion = Class.extend({
 
 		this.bindEvents();
 
-		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
-
 	},
 
 
@@ -75,44 +75,50 @@ var Accordion = Class.extend({
 **/
 
 	initDOM: function() {
-		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
-		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
+		var $activeTab = $(this.$tabs[this.currentIndex]);
+		var $activePanel = $(this.$panels[this.currentIndex]);
 
 		this.$el.attr({'role':'tablist'});
-		this.$elTabs.attr({'role':'tab'});
-		this.$elPanels.attr({'role':'tabpanel', 'tabindex':'-1'});
+		this.$tabs.attr({'role':'tab'});
+		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1'});
 
 		// equalize items height
 		if (this.options.equalizeHeight) {
-			this.heightEqualizer = new HeightEqualizer(this.$elPanels);
+			this.heightEqualizer = new HeightEqualizer( this.$el, {
+				selectorItems: this.options.selectorPanels,
+				setParentHeight: false
+			});
 			this.maxHeight = this.heightEqualizer.maxHeight;
 		}
 
-		$elActiveTab.addClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass);
+		$activeTab.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass);
 
-		TweenMax.set(this.$elPanels, {
+		TweenMax.set(this.$panels, {
 			display: 'none',
-			height: this.maxHeight,
+			height: this.maxHeight
 		});
 
-		TweenMax.set($elActivePanel, {
+		TweenMax.set($activePanel, {
 			display: 'block',
-			height: this.maxHeight,
+			height: this.maxHeight
 		});
 
+		// initial focus on content
 		if (this.focusOnInit) {
 			$(window).load(function() {
-				$('html, body').animate({scrollTop:0}, 1);
-				$elActivePanel.focus();
-			});
+				this.$htmlBody.animate({scrollTop: 0}, 1);
+				this.focusOnPanel($activePanel);
+			}.bind(this));
 		}
+
+		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
 
 	},
 
 	bindEvents: function() {
 
-		this.$elTabs.on('click', function(event) {
+		this.$tabs.on('click', function(event) {
 			event.preventDefault();
 			if (!this.isAnimating) {
 				this.__clickTab(event);
@@ -138,39 +144,41 @@ var Accordion = Class.extend({
 	},
 
 	__clickTab: function(event) {
-		var index = this.$elTabs.index(event.currentTarget);
+		var index = this.$tabs.index(event.currentTarget);
 
 		// if selfClosing then check various states of acordion
 		if (this.options.selfClosing) {
 
 			// currentIndex is open
 			if (this.currentIndex === index) {
-				this.prevIndex = false;
+				this.prevIndex = null;
 				this.currentIndex = -1;
-				this.animateSelfClosed(index);
+				this.animatePanelClosed(index);
 
 			// currentIndex is -1, all are closed
 			} else if (this.currentIndex === -1) {
-				this.prevIndex = false;
+				this.prevIndex = null;
 				this.currentIndex = index;
-				this.animateSelfOpen(index);
+				this.animatePanelOpen(index);
 
 			// default behaviour
 			} else {
 				this.prevIndex = this.currentIndex;
 				this.currentIndex = index;
-				this.animateAccordion();
+				this.animatePanelClosed(this.prevIndex);
+				this.animatePanelOpen(this.currentIndex);
 			}
 
 		// else accordion operates as normal
 		} else {
 
 			if (this.currentIndex === index) {
-				this.$elPanels[index].focus();
+				this.$panels[index].focus();
 			} else {
 				this.prevIndex = this.currentIndex;
 				this.currentIndex = index;
-				this.animateAccordion();
+				this.animatePanelClosed(this.prevIndex);
+				this.animatePanelOpen(this.currentIndex);
 			}
 
 		}
@@ -182,119 +190,73 @@ var Accordion = Class.extend({
 *	Public Methods
 **/
 
-	animateSelfClosed: function(index) {
+	animatePanelClosed: function(index) {
 		var self = this;
-		var $elInactiveTab = $(this.$elTabs[index]);
-		var $elInactivePanel = $(this.$elPanels[index]);
+		var $inactiveTab = $(this.$tabs[index]);
+		var $inactivePanel = $(this.$panels[index]);
 
 		this.isAnimating = true;
 
-		$elInactiveTab.removeClass(this.options.activeClass);
-		$elInactivePanel.removeClass(this.options.activeClass);
+		$inactiveTab.removeClass(this.options.activeClass);
+		$inactivePanel.removeClass(this.options.activeClass);
 
-		TweenMax.to($elInactivePanel, this.options.animDuration, {
+		TweenMax.to($inactivePanel, this.options.animDuration, {
 			height: 0,
 			ease: self.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
-				$elInactiveTab.focus();
-				TweenMax.set($elInactivePanel, {
+				$inactiveTab.focus();
+				TweenMax.set($inactivePanel, {
 					display: 'none',
 					height: self.maxHeight
 				});
 			}
 		});
 
-		$.event.trigger(this.options.customEventPrfx + ':panelClosed');
-
 	},
 
-	animateSelfOpen: function(index) {
+	animatePanelOpen: function(index) {
 		var self = this;
-		var $elActiveTab = $(this.$elTabs[index]);
-		var $elActivePanel = $(this.$elPanels[index]);
-		var height = $elActivePanel.height();
+		var $activeTab = $(this.$tabs[index]);
+		var $activePanel = $(this.$panels[index]);
+		var panelHeight = $activePanel.outerHeight();
 
 		this.isAnimating = true;
 
-		$elActiveTab.addClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass);
+		$activeTab.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass);
 
 		if (this.options.equalizeHeight) {
-			height = this.maxHeight;
-			TweenMax.set($elActivePanel, {
+			panelHeight = this.maxHeight;
+			TweenMax.set($activePanel, {
 				height: 0
 			});
 		}
 
-		TweenMax.to($elActivePanel, this.options.animDuration, {
+		TweenMax.to($activePanel, this.options.animDuration, {
 			display: 'block',
-			height: height,
+			height: panelHeight,
 			ease: self.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
-				$elActivePanel.focus();
-				TweenMax.set($elActivePanel, {
+				$activePanel.focus();
+				TweenMax.set($activePanel, {
 					height: self.maxHeight
 				});
 			}
 		});
+
+		this.focusOnPanel($activePanel);
 
 		$.event.trigger(this.options.customEventPrfx + ':panelOpened', [this.currentIndex]);
 
 	},
 
-	animateAccordion: function() {
-		var self = this;
-		var $elInactiveTab = $(this.$elTabs[this.prevIndex]);
-		var $elInactivePanel = $(this.$elPanels[this.prevIndex]);
-		var $elActiveTab = $(this.$elTabs[this.currentIndex]);
-		var $elActivePanel = $(this.$elPanels[this.currentIndex]);
-		var height = $elActivePanel.height();
-
-		this.isAnimating = true;
-
-		//update tabs
-		$elInactiveTab.removeClass(this.options.activeClass);
-		$elActiveTab.addClass(this.options.activeClass);
-
-		//update panels
-		$elInactivePanel.removeClass(this.options.activeClass);
-		$elActivePanel.addClass(this.options.activeClass);
-
-		if (this.options.equalizeHeight) {
-			height = this.maxHeight;
-			TweenMax.set($elActivePanel, {
-				height: 0
-			});
-		}
-
-		TweenMax.to($elActivePanel, this.options.animDuration, {
-			display: 'block',
-			height: height,
-			ease: self.options.animEasing,
-			onComplete: function() {
-				self.isAnimating = false;
-				$elActivePanel.focus();
-				TweenMax.set($elActivePanel, {
-					height: self.maxHeight
-				});
-			}
+	focusOnPanel: function($panel) {
+		var scrollYPos = $panel.offset().top;
+		this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+			$panel.focus();
 		});
-
-		TweenMax.to($elInactivePanel, this.options.animDuration, {
-			height: 0,
-			ease: self.options.animEasing,
-			onComplete: function() {
-				TweenMax.set($elInactivePanel, {
-					display: 'none',
-					height: self.maxHeight
-				});
-			}
-		});
-
-		$.event.trigger(this.options.customEventPrfx + ':panelOpened', [this.currentIndex]);
-
 	}
 
 });

@@ -5,65 +5,58 @@
 
 .accordion {
 	width: 100%;
+	border-bottom: 2px solid #000;
 	margin-bottom: 1em;
 	position: relative;
 }
 
-	.accordion > dl {
+	.accordion .accordion-header {
+		border-top: 2px solid #000;
 		border-bottom: 2px solid #000;
+		margin: 0 0 -2px 0;
+		position: relative;
+		z-index: 2;
 	}
-		.accordion > dl > dt {
-			border-top: 2px solid #000;
-			border-bottom: 2px solid #000;
-			margin: 0 0 -2px 0;
+		.accordion .accordion-header > a {
+			display: block;
+			color: #101010;
+			text-decoration: none;
+			background: #dcdcdc;
+			padding: 0.5em 1em;
 			position: relative;
-			z-index: 2;
 		}
-		.accordion > dl > dd {
-			margin: 0;
-			position: relative;
-			z-index: 1;
+		.accordion .accordion-header > a:after {
+			content: ">";
+			display: block;
+			position: absolute;
+			right: 20px;
+			top: calc(50% - 0.75em);
+			transform: scaleX(2.5) rotate(90deg);
 		}
-		.accordion .tab {}
-			.accordion .tab > a {
-				display: block;
-				color: #101010;
-				text-decoration: none;
-				background: #dcdcdc;
-				padding: 0.5em 1em;
-				position: relative;
-			}
-			.accordion .tab > a:after {
-				content: ">";
-				display: block;
-				font-weight: normal;
-				position: absolute;
-				right: 20px;
-				top: calc(50% - 0.75em);
-				transform: scaleX(2.5) rotate(90deg);
-			}
-			.accordion .tab > a:hover,
-			.accordion .tab > a:focus {
-				color: #fff;
-				background: #787878;
-			}
-			.accordion .tab > a.active {
-				color: #fff;
-				background: #333;
-			}
-			.accordion .tab > a.active:after {
-				transform: scaleX(2.5) rotate(-90deg);
-			}
+		.accordion .accordion-header > a.active {
+			color: #fff;
+			background: #333;
+		}
+		.accordion .accordion-header > a:hover,
+		.accordion .accordion-header > a:focus {
+			color: #fff;
+			background: #787878;
+		}
+		.accordion .accordion-header > a.active:after {
+			transform: scaleX(2.5) rotate(-90deg);
+		}
 
-	.accordion article.panel {
+	.accordion .accordion-panel {
+		margin: 0;
 		overflow: hidden;
 		position: relative;
+		z-index: 1;
 	}
-		.accordion article.panel > .panel-content {
-			padding: 1em;
+		.accordion .accordion-panel > .panel-content {
+			padding: 1.5em;
 			position: relative;
 		}
-	.accordion article.panel:focus {
+	.accordion .accordion-panel:focus {
 		/* note: focus style is meant merely for demo purpose (is not necessary to meet accessibility reqs) */
 		background: #f9f9f9;
 	}
