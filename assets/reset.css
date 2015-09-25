@@ -150,37 +150,39 @@ img {
 }
 
 #content {
-	width: 100%;
-	min-width: 360px;
+	width: calc(100% - 20px);
+	min-width: 372px;
 	min-height: 100vh;
 	background: #fff;
 	margin: 0 auto;
 	padding: 40px 20px;
+	position: relative;
 }
 
-/* Tablet */
-@media (min-width: 768px) {
+/* Mobile - */
+@media (max-width: 767px) {
+	#content {
+		max-width: 640px;
+	}
+}
 
+/* Tablet + */
+@media (min-width: 768px) {
 	#content {
 		width: 760px;
 	}
-
 }
 
-/* Desktop */
+/* Desktop + */
 @media (min-width: 1024px) {
-
 	#content {
 		width: 1000px;
 	}
-
 }
 
-/* Desktop Wide */
+/* Desktop Wide + */
 @media (min-width: 1280px) {
-
 	#content {
-		width: 1200px;
+		width: 1240px;
 	}
-
 }
