@@ -202,7 +202,7 @@ var Accordion = Class.extend({
 
 		TweenMax.to($inactivePanel, this.options.animDuration, {
 			height: 0,
-			ease: self.options.animEasing,
+			ease: this.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
 				$inactiveTab.focus();
@@ -236,7 +236,7 @@ var Accordion = Class.extend({
 		TweenMax.to($activePanel, this.options.animDuration, {
 			display: 'block',
 			height: panelHeight,
-			ease: self.options.animEasing,
+			ease: this.options.animEasing,
 			onComplete: function() {
 				self.isAnimating = false;
 				$activePanel.focus();
