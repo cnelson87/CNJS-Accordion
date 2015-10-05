@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic Accordion widget
 
-	VERSION: 0.2.2
+	VERSION: 0.2.3
 
 	USAGE: var myAccordion = new Accordion('Element', 'Options')
 		@param {jQuery Object}
@@ -48,6 +48,7 @@ var Accordion = Class.extend({
 		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
 		this.prevIndex = null;
+		this.heightEqualizer = null;
 		this.maxHeight = 'auto';
 
 		// check url hash to override currentIndex
@@ -254,9 +255,15 @@ var Accordion = Class.extend({
 
 	focusOnPanel: function($panel) {
 		var scrollYPos = $panel.offset().top;
-		this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+		var pnlHeight = $panel.outerHeight();
+		var winHeight = this.$window.height();
+		if (pnlHeight > winHeight) {
+			this.$htmlBody.animate({scrollTop: scrollYPos}, 200, function(){
+				$panel.focus();
+			});
+		} else {
 			$panel.focus();
-		});
+		}
 	}
 
 });
