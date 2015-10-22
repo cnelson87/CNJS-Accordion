@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic Accordion widget
 
-	VERSION: 0.2.3
+	VERSION: 0.2.4
 
 	USAGE: var myAccordion = new Accordion('Element', 'Options')
 		@param {jQuery Object}
@@ -12,7 +12,7 @@
 	AUTHOR: CN
 
 	DEPENDENCIES:
-		- jQuery 2.1.4+
+		- jQuery 2.1x+
 		- greensock
 		- Class.js
 		- HeightEqualizer.js
@@ -35,7 +35,8 @@ var Accordion = Class.extend({
 			selfClosing: true,
 			animDuration: 0.4,
 			animEasing: 'Power4.easeOut',
-			customEventPrfx: 'CNJS:Accordion'
+			selectorFocusEls: 'a, button, input, select, textarea',
+			customEventName: 'CNJS:Accordion'
 		}, objOptions || {});
 
 		// element references
@@ -43,19 +44,19 @@ var Accordion = Class.extend({
 		this.$panels = this.$el.find(this.options.selectorPanels);
 
 		// setup & properties
-		this.isAnimating = false;
-		this._len = this.$panels.length;
-		if (this.options.initialIndex >= this._len) {this.options.initialIndex = 0;}
+		this._length = this.$panels.length;
+		if (this.options.initialIndex >= this._length) {this.options.initialIndex = 0;}
 		this.currentIndex = this.options.initialIndex;
-		this.prevIndex = null;
+		this.previousIndex = null;
 		this.heightEqualizer = null;
 		this.maxHeight = 'auto';
+		this.isAnimating = false;
 
 		// check url hash to override currentIndex
 		this.focusOnInit = false;
 		this.urlHash = window.location.hash.replace('#','') || false;
 		if (this.urlHash) {
-			for (var i=0; i<this._len; i++) {
+			for (var i=0; i<this._length; i++) {
 				if (this.$panels[i].id === this.urlHash) {
 					this.currentIndex = i;
 					this.focusOnInit = true;
@@ -68,6 +69,8 @@ var Accordion = Class.extend({
 
 		this.bindEvents();
 
+		$.event.trigger(this.options.customEventName + ':isInitialized', [this.$el]);
+
 	},
 
 
@@ -76,12 +79,13 @@ var Accordion = Class.extend({
 **/
 
 	initDOM: function() {
-		var $activeTab = $(this.$tabs[this.currentIndex]);
-		var $activePanel = $(this.$panels[this.currentIndex]);
+		var $activeTab = this.$tabs.eq(this.currentIndex);
+		var $activePanel = this.$panels.eq(this.currentIndex);
 
 		this.$el.attr({'role':'tablist'});
-		this.$tabs.attr({'role':'tab'});
+		this.$tabs.attr({'role':'tab', 'tabindex':'0'});
 		this.$panels.attr({'role':'tabpanel', 'tabindex':'-1'});
+		this.$panels.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
 
 		// equalize items height
 		if (this.options.equalizeHeight) {
@@ -93,7 +97,8 @@ var Accordion = Class.extend({
 		}
 
 		$activeTab.addClass(this.options.activeClass);
-		$activePanel.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		TweenMax.set(this.$panels, {
 			display: 'none',
@@ -112,8 +117,6 @@ var Accordion = Class.extend({
 				this.focusOnPanel($activePanel);
 			}.bind(this));
 		}
-
-		$.event.trigger(this.options.customEventPrfx + ':isInitialized', [this.$el]);
 
 	},
 
@@ -152,21 +155,21 @@ var Accordion = Class.extend({
 
 			// currentIndex is open
 			if (this.currentIndex === index) {
-				this.prevIndex = null;
+				this.previousIndex = null;
 				this.currentIndex = -1;
 				this.animatePanelClosed(index);
 
 			// currentIndex is -1, all are closed
 			} else if (this.currentIndex === -1) {
-				this.prevIndex = null;
+				this.previousIndex = null;
 				this.currentIndex = index;
 				this.animatePanelOpen(index);
 
 			// default behaviour
 			} else {
-				this.prevIndex = this.currentIndex;
+				this.previousIndex = this.currentIndex;
 				this.currentIndex = index;
-				this.animatePanelClosed(this.prevIndex);
+				this.animatePanelClosed(this.previousIndex);
 				this.animatePanelOpen(this.currentIndex);
 			}
 
@@ -176,9 +179,9 @@ var Accordion = Class.extend({
 			if (this.currentIndex === index) {
 				this.$panels[index].focus();
 			} else {
-				this.prevIndex = this.currentIndex;
+				this.previousIndex = this.currentIndex;
 				this.currentIndex = index;
-				this.animatePanelClosed(this.prevIndex);
+				this.animatePanelClosed(this.previousIndex);
 				this.animatePanelOpen(this.currentIndex);
 			}
 
@@ -193,13 +196,14 @@ var Accordion = Class.extend({
 
 	animatePanelClosed: function(index) {
 		var self = this;
-		var $inactiveTab = $(this.$tabs[index]);
-		var $inactivePanel = $(this.$panels[index]);
+		var $inactiveTab = this.$tabs.eq(index);
+		var $inactivePanel = this.$panels.eq(index);
 
 		this.isAnimating = true;
 
 		$inactiveTab.removeClass(this.options.activeClass);
-		$inactivePanel.removeClass(this.options.activeClass);
+		$inactivePanel.removeClass(this.options.activeClass).attr({'tabindex':'-1'});
+		$inactivePanel.find(this.options.selectorFocusEls).attr({'tabindex':'-1'});
 
 		TweenMax.to($inactivePanel, this.options.animDuration, {
 			height: 0,
@@ -218,14 +222,15 @@ var Accordion = Class.extend({
 
 	animatePanelOpen: function(index) {
 		var self = this;
-		var $activeTab = $(this.$tabs[index]);
-		var $activePanel = $(this.$panels[index]);
+		var $activeTab = this.$tabs.eq(index);
+		var $activePanel = this.$panels.eq(index);
 		var panelHeight = $activePanel.outerHeight();
 
 		this.isAnimating = true;
 
 		$activeTab.addClass(this.options.activeClass);
-		$activePanel.addClass(this.options.activeClass);
+		$activePanel.addClass(this.options.activeClass).attr({'tabindex':'0'});
+		$activePanel.find(this.options.selectorFocusEls).attr({'tabindex':'0'});
 
 		if (this.options.equalizeHeight) {
 			panelHeight = this.maxHeight;
@@ -249,7 +254,7 @@ var Accordion = Class.extend({
 
 		this.focusOnPanel($activePanel);
 
-		$.event.trigger(this.options.customEventPrfx + ':panelOpened', [this.currentIndex]);
+		$.event.trigger(this.options.customEventName + ':panelOpened', [this.currentIndex]);
 
 	},
 
