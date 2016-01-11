@@ -1,7 +1,7 @@
 {
 	"name": "CNJS-Accordion",
 	"description": "Basic Accordion widget",
-	"version": "0.2.6.1",
+	"version": "0.2.7",
 	"main": [
 		"assets/Accordion.js",
 		"assets/Accordion.css"

@@ -3,7 +3,7 @@
 
 	DESCRIPTION: Basic Accordion widget
 
-	VERSION: 0.2.6
+	VERSION: 0.2.7
 
 	USAGE: var myAccordion = new Accordion('Element', 'Options')
 		@param {jQuery Object}
@@ -120,19 +120,28 @@ var Accordion = Class.extend({
 
 	},
 
+	uninitDOM: function() {
+
+		this.$el.removeAttr('role aria-live');
+		this.$tabs.removeAttr('role tabindex aria-selected').removeClass(this.options.activeClass);
+		this.$panels.removeAttr('role tabindex aria-hidden').removeClass(this.options.activeClass);
+		this.$panels.find(this.options.selectorFocusEls).removeAttr('tabindex');
+
+		TweenMax.set(this.$panels, {
+			display: '',
+			height: ''
+		});
+
+	},
+
 	bindEvents: function() {
+		this.$window.on('resize', this.__onWindowResize.bind(this));
+		this.$tabs.on('click', this.__clickTab.bind(this));
+	},
 
-		this.$tabs.on('click', function(event) {
-			event.preventDefault();
-			if (!this.isAnimating) {
-				this.__clickTab(event);
-			}
-		}.bind(this));
-
-		this.$window.on('resize', function(event) {
-			this.__onWindowResize(event);
-		}.bind(this));
-
+	unbindEvents: function() {
+		this.$window.off('resize', this.__onWindowResize.bind(this));
+		this.$tabs.off('click', this.__clickTab.bind(this));
 	},
 
 
@@ -148,7 +157,10 @@ var Accordion = Class.extend({
 	},
 
 	__clickTab: function(event) {
+		event.preventDefault();
 		var index = this.$tabs.index(event.currentTarget);
+
+		if (this.isAnimating) {return;}
 
 		// if selfClosing then check various states of acordion
 		if (this.options.selfClosing) {
@@ -270,6 +282,15 @@ var Accordion = Class.extend({
 		} else {
 			$panel.focus();
 		}
+	},
+
+	unInitialize: function() {
+		this.unbindEvents();
+		this.uninitDOM();
+		this.$el = null;
+		this.$tabs = null;
+		this.$panels = null;
+		$.event.trigger(this.options.customEventName + ':unInitialized');
 	}
 
 });
