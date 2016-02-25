@@ -11,7 +11,7 @@
 		"url": "https://github.com/cnelson87/CNJS-Accordion"
 	},
 	"dependencies": {
-		"jquery": "~2.2.0",
+		"jquery": "~2.2.1",
 		"greensock": "~1.18.2",
 		"Class.js": "~1.0.0",
 		"CNJS-HeightEqualizer": ""
